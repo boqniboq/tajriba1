@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shahodatnoma</title>
     <style>
-        /* Полностью убираем прокрутку, отступы и лишние элементы */
+        /* Полностью блокируем любые сдвиги, прокрутки и масштабирование */
         html, body { 
             margin: 0; 
             padding: 0; 
@@ -13,58 +13,63 @@
             height: 100%; 
             overflow: hidden; 
             background-color: #fff;
-        }
-
-        /* Контейнер, который подстраивается под экран и держит пропорции бланка */
-        .wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Ваш PDF-аттестат открывается на весь экран без возможности ручного масштабирования */
-        .pdf-view { 
-            width: 100%; 
-            height: 100%; 
-            border: none;
-            display: block;
+        /* Контейнер, который намертво держит картинку по центру экрана */
+        .page-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-width: 600px; /* Ограничение ширины для компьютеров */
+            max-height: 850px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* QR-код намертво прикреплен строго по центру в нижней части бланка между подписями */
+        /* Аттестат как картинка: сам сжимается под экран телефона и не двигается */
+        .blank-img { 
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Картинка идеально впишется в экран без обрезки */
+            pointer-events: none;
+        }
+
+        /* Альтернативный автоматический QR-код на Dub.co API */
         .qr-fixed { 
             position: absolute; 
-            bottom: 11.2%; /* Идеальная высота, чтобы встать ровно между Директором и Датой */
-            left: 50.5%;   /* Центровка с микро-смещением для идеального попадания в пустое поле */
+            bottom: 11.2%; /* Идеальная высота над нижним краем бланка */
+            left: 50.3%;   /* Выравнивание точно по центру белого поля */
             transform: translateX(-50%);
             background: #fff; 
             padding: 1px;
             display: flex;
-            pointer-events: none; /* Защита: код нельзя случайно сдвинуть пальцем */
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <!-- Чистый PDF-документ -->
-        <iframe src="document.pdf" class="pdf-view"></iframe>
+    <div class="page-container">
+        <!-- Бланк аттестата в виде адаптивной картинки -->
+        <img src="document.jpg" class="blank-img" alt="Attestat">
         
-        <!-- Автоматический QR-код, который прилипает намертво -->
+        <!-- Новый авто-генератор QR-кодов от Dub.co -->
         <div class="qr-fixed">
-            <img id="dynamic-qr" src="" alt="QR" width="85" height="85">
+            <img id="dynamic-qr" src="" alt="QR" width="82" height="82">
         </div>
     </div>
 
     <script>
-        // Робот определяет точную ссылку на ваш сайт в интернете
+        // Скрипт определяет ссылку на ваш сайт в интернете
         var currentUrl = window.location.href;
         
-        // Автоматически генерируем QR-код под эту ссылку через фабрику qrserver
+        // Подключаем альтернативный стабильный генератор Dub.co API
         var qrImage = document.getElementById('dynamic-qr');
-        qrImage.src = 'https://qrserver.com' + encodeURIComponent(currentUrl);
+        qrImage.src = 'https://dub.co' + encodeURIComponent(currentUrl);
     </script>
 
 </body>
