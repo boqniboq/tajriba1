@@ -2,11 +2,9 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <!-- РАЗРЕШАЕМ ПРИБЛИЖЕНИЕ: убрали запрет на зум, теперь можно приближать пальцами -->
+    <!-- ЗУМ РАЗРЕШЕН: пользователь может свободно увеличивать и уменьшать документ пальцами -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shahodatnoma</title>
-    <!-- Подключаем надежную библиотеку для генерации QR прямо в браузере -->
-    <script src="https://cloudflare.com"></script>
     <style>
         html, body { 
             margin: 0; 
@@ -16,7 +14,7 @@
             font-family: Arial, sans-serif;
         }
         
-        /* Разрешаем странице прокручиваться, когда документ увеличен */
+        /*wrapper позволяет листу плавно двигаться при приближении зумом */
         .wrapper {
             width: 100%;
             display: flex;
@@ -24,24 +22,24 @@
             padding: 10px 0;
         }
 
-        /* Контейнер бланка: держит четкие пропорции, чтобы QR-код не съезжал при зуме */
+        /* Контейнер жестко фиксирует картинку, чтобы QR-код не съезжал при увеличении */
         .page-container {
             position: relative;
             width: 100%;
-            max-width: 600px; /* Идеальная ширина для мобильных и ПК */
+            max-width: 600px; /* Идеальный размер для дисплеев телефонов и ПК */
             display: inline-block;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             background: #fff;
         }
 
-        /* Аттестат-картинка занимает всю ширину контейнера */
+        /* Картинка аттестата */
         .blank-img { 
             width: 100%;
             height: auto;
             display: block;
         }
 
-        /* QR-код намертво прилипает к координатам картинки. При зуме он будет увеличиваться вместе с ней! */
+        /* Посадочное место QR-кода строго по центру на белом поле */
         .qr-fixed { 
             position: absolute; 
             bottom: 11.2%; 
@@ -57,26 +55,23 @@
 
     <div class="wrapper">
         <div class="page-container">
-            <!-- Бланк аттестата -->
+            <!-- Бланк вашего аттестата -->
             <img src="document.jpg" class="blank-img" alt="Attestat">
             
-            <!-- Место, куда автономно встроится QR-код -->
-            <div id="qrcode" class="qr-fixed"></div>
+            <!-- Сюда робот приклеит новый QR-код -->
+            <div class="qr-fixed">
+                <img id="dynamic-qr" src="" alt="QR-код" width="85" height="85">
+            </div>
         </div>
     </div>
 
     <script>
-        // Скрипт мгновенно генерирует QR-код на основе текущей ссылки
+        // Робот определяет точную ссылку вашего рабочего сайта в интернете
         var currentUrl = window.location.href;
         
-        new QRCode(document.getElementById("qrcode"), {
-            text: currentUrl,
-            width: 85,
-            height: 85,
-            colorDark : "#000000",
-            colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
-        });
+        // Подключаем передовой и открытый генератор QuickChart (работает без сбоев на ПК и телефонах)
+        var qrImage = document.getElementById('dynamic-qr');
+        qrImage.src = 'https://quickchart.io' + encodeURIComponent(currentUrl);
     </script>
 
 </body>
