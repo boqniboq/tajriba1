@@ -2,7 +2,7 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <!-- ЗУМ РАЗРЕШЕН: вы можете свободно увеличивать картинку пальцами -->
+    <!-- ЗУМ РАЗРЕШЕН: документ можно свободно увеличивать пальцами -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shahodatnoma</title>
     <style>
@@ -11,43 +11,53 @@
             padding: 0; 
             width: 100%; 
             background-color: #f0f0f4;
-            font-family: Arial, sans-serif;
-        }
-        
-        /*wrapper позволяет листу плавно двигаться при приближении зумом */
-        .wrapper {
-            width: 100%;
             display: flex;
             justify-content: center;
-            padding: 10px 0;
+        }
+        
+        .wrapper {
+            width: 100%;
+            max-width: 600px; /* Ограничение ширины листа на ПК */
+            padding: 15px 0;
+            box-sizing: border-box;
         }
 
-        /* Контейнер жестко фиксирует картинку, чтобы QR-код не съезжал при увеличении */
+        /* КОНТЕЙНЕР А4: этот блок ВСЕГДА сохраняет пропорции государственного бланка */
         .page-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
-            display: inline-block;
+            height: 0;
+            padding-bottom: 141.4%; /* Магическое число: идеальная пропорция листа А4 (высота к ширине) */
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             background: #fff;
         }
 
-        /* Картинка вашего аттестата */
+        /* Картинка аттестата намертво растягивается внутри контейнера А4 */
         .blank-img { 
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
-            height: auto;
+            height: 100%;
             display: block;
         }
 
-        /* Посадочное место QR-кода строго по центру на белом поле */
+        /* ЖЕСТКАЯ ПРИВЯЗКА К ЛИСТУ: код привязан к процентам самого бланка, а не экрана телефона */
         .qr-fixed { 
             position: absolute; 
-            bottom: 11.2%; 
-            left: 50.3%;   
+            bottom: 9.3%;      /* Точнейшая высота на бланке А4, чтобы сесть на белое поле */
+            left: 50.3%;       /* Выравнивание строго по центру между текстом */
             transform: translateX(-50%);
+            width: 14%;        /* Размер QR-кода теперь тоже зависит от размера листа */
+            height: auto;
             background: #fff; 
-            padding: 2px;
+            padding: 0.5%;     /* Микроскопическая белая рамка */
             display: flex;
+        }
+        .qr-fixed img {
+            width: 100%;
+            height: auto;
+            display: block;
         }
     </style>
 </head>
@@ -58,47 +68,21 @@
             <!-- Бланк вашего аттестата -->
             <img src="document.jpg" class="blank-img" alt="Attestat">
             
-            <!-- Сюда сайт полностью самостоятельно нарисует QR-код -->
-            <div id="qrcode" class="qr-fixed"></div>
+            <!-- Посадочное место для QR-кода -->
+            <div class="qr-fixed">
+                <img id="dynamic-qr" src="" alt="QR">
+            </div>
         </div>
     </div>
 
     <script>
-        // ПОЛНОСТЬЮ АВТОНОМНЫЙ МАТЕМАТИЧЕСКИЙ МИНИ-ГЕНЕРАТОР QR-КОДА
-        function generatePureQR(text, size) {
-            var url = text;
-            // Простейшая разметка мини-кода для коротких ссылок GitHub Pages
-            // Браузер сам генерирует стандартную SVG графику
-            var svg = '<svg xmlns="http://w3.org" viewBox="0 0 29 29" width="' + size + '" height="' + size + '" shape-rendering="crispEdges">';
-            svg += '<rect width="29" height="29" fill="#ffffff"/>';
-            
-            // Матрица стандартных поисковых квадратов по углам (чтобы камера понимала код)
-            function drawBox(x, y) {
-                var res = '';
-                res += '<rect x="' + x + '" y="' + y + '" width="7" height="7" fill="#000000"/>';
-                res += '<rect x="' + (x+1) + '" y="' + (y+1) + '" width="5" height="5" fill="#ffffff"/>';
-                res += '<rect x="' + (x+2) + '" y="' + (y+2) + '" width="3" height="3" fill="#000000"/>';
-                return res;
-            }
-            
-            // Отрисовка угловых меток
-            svg += drawBox(0, 0);   // Верхний левый
-            svg += drawBox(22, 0);  // Верхний правый
-            svg += drawBox(0, 22);  // Нижний левый
-            
-            // Синхродорожки и выравнивание
-            svg += '<rect x="6" y="2" width="1" height="1" fill="#000000"/>';
-            svg += '<rect x="2" y="6" width="1" height="1" fill="#000000"/>';
-            svg += '<rect x="22" y="6" width="1" height="1" fill="#000000"/>';
-            svg += '<rect x="6" y="22" width="1" height="1" fill="#000000"/>';
-            
-            // Генерируем уникальный узор пикселей на основе букв вашей ссылки
-            var hash = 0;
-            for (var i = 0; i < url.length; i++) {
-                hash = url.charCodeAt(i) + ((hash << 5) - hash);
-            }
-            
-            // Заполняем внутреннюю часть случайным, но постоянным узором под вашу ссылку
-            for (var r = 0; r < 29; r++) {
-                for (var c = 0; c < 29; r == 0 && c == 7 ? c = 22 : (r == 7 && c == 0 ? c = 29 : (r == 22 && c == 0 ? c = 7 : c++))) {
-                    if (c >= 29) break;
+        // Робот определяет ссылку вашего рабочего сайта boqibooq.github.io/tajriba1/
+        var currentUrl = window.location.href;
+        
+        // Подключаем стабильный открытый генератор QuickChart
+        var qrImage = document.getElementById('dynamic-qr');
+        qrImage.src = 'https://quickchart.io' + encodeURIComponent(currentUrl);
+    </script>
+
+</body>
+</html>
