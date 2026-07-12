@@ -1,86 +1,68 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SHAHODATNOMA - Официальный документ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shahodatnoma</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
+        /* Полностью убираем прокрутку, отступы и лишние элементы */
+        html, body { 
             margin: 0; 
             padding: 0; 
-            background: #f0f0f4; 
-            text-align: center; 
-        }
-        
-        /* Верхняя панель со строчкой для скачивания оригинала */
-        .download-bar { 
-            background: #ffffff; 
-            padding: 15px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
-        }
-        .btn-download { 
-            display: inline-block; 
-            padding: 10px 20px; 
-            color: white; 
-            background: #007bff; 
-            text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold; 
-        }
-        
-        /* Главный контейнер бланка аттестата */
-        .document-container { 
-            position: relative; 
-            max-width: 750px; 
-            margin: 20px auto; 
-            height: 95vh; 
-            border-radius: 4px; 
-            overflow: hidden; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
-        }
-        
-        /* Окно, открывающее ваш чистый PDF-файл */
-        .pdf-viewer { 
             width: 100%; 
             height: 100%; 
-            border: none; 
+            overflow: hidden; 
+            background-color: #fff;
         }
-        
-        /* Автоматический QR-код: встает строго по центру между директором и датой */
-        .auto-qr-code { 
-            position: absolute; 
-            bottom: 11%;       /* Идеальная высота для этого бланка аттестата */
-            left: 50%;         /* Центровка ровно по середине листа */
-            transform: translateX(-50%); 
-            background: white; 
-            padding: 4px;      /* Небольшая белая рамка вокруг кода */
+
+        /* Контейнер, который подстраивается под экран и держит пропорции бланка */
+        .wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
             display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Ваш PDF-аттестат открывается на весь экран без возможности ручного масштабирования */
+        .pdf-view { 
+            width: 100%; 
+            height: 100%; 
+            border: none;
+            display: block;
+        }
+
+        /* QR-код намертво прикреплен строго по центру в нижней части бланка между подписями */
+        .qr-fixed { 
+            position: absolute; 
+            bottom: 11.2%; /* Идеальная высота, чтобы встать ровно между Директором и Датой */
+            left: 50.5%;   /* Центровка с микро-смещением для идеального попадания в пустое поле */
+            transform: translateX(-50%);
+            background: #fff; 
+            padding: 1px;
+            display: flex;
+            pointer-events: none; /* Защита: код нельзя случайно сдвинуть пальцем */
         }
     </style>
 </head>
 <body>
 
-    <div class="download-bar">
-        <!-- Кнопка, которая позволит скачать чистый PDF в один клик -->
-        <a href="document.pdf" download="document.pdf" class="btn-download">⬇️ Скачать оригинал PDF-аттестата</a>
-    </div>
-
-    <div class="document-container">
-        <!-- Показываем ваш чистый PDF файл из GitHub -->
-        <iframe src="document.pdf" class="pdf-viewer"></iframe>
+    <div class="wrapper">
+        <!-- Чистый PDF-документ -->
+        <iframe src="document.pdf" class="pdf-view"></iframe>
         
-        <!-- Сюда робот сам приклеит QR-код в нужное место бланка -->
-        <div class="auto-qr-code">
-            <img id="dynamic-qr" src="" alt="Автоматический QR-код" width="85" height="85">
+        <!-- Автоматический QR-код, который прилипает намертво -->
+        <div class="qr-fixed">
+            <img id="dynamic-qr" src="" alt="QR" width="85" height="85">
         </div>
     </div>
 
     <script>
-        // Робот определяет текущую ссылку на ваш сайт boqibooq.github.io/tajriba1/
+        // Робот определяет точную ссылку на ваш сайт в интернете
         var currentUrl = window.location.href;
         
-        // Робот обращается к фабрике QRserver и генерирует код
+        // Автоматически генерируем QR-код под эту ссылку через фабрику qrserver
         var qrImage = document.getElementById('dynamic-qr');
         qrImage.src = 'https://qrserver.com' + encodeURIComponent(currentUrl);
     </script>
